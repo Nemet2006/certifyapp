@@ -1,0 +1,5 @@
+certifyapp:
+  aws:
+    endpoint: http://localstack:4566
+    access-key-id: localstack
+    secret-access-key: localstack

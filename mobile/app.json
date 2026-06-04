@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "CertifyApp",
+    "slug": "certifyapp",
+    "version": "0.1.0",
+    "platforms": ["ios", "android"],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a1628"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "az.certifyapp.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a1628"
+      },
+      "package": "az.certifyapp.mobile",
+      "usesCleartextTraffic": true
+    },
+    "extra": {
+      "apiUrl": "http://10.0.2.2:8090",
+      "apiUrlLan": "http://192.168.1.101:8090"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Sertifikat skan etmək üçün kameraya icazə verin.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Sertifikat şəkillərini seçmək üçün qalereyaya icazə verin."
+        }
+      ]
+    ]
+  }
+}

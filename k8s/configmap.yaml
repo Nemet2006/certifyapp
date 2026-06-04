@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: certifyapp-config
+  namespace: certifyapp
+data:
+  DATABASE_URL: "jdbc:postgresql://postgres:5432/certifyapp"
+  REDIS_HOST: "redis"
+  RABBITMQ_HOST: "rabbitmq"
+  JWT_ISSUER: "certifyapp"
+  AWS_REGION: "eu-central-1"
+  AWS_S3_BUCKET: "certifyapp-prod"

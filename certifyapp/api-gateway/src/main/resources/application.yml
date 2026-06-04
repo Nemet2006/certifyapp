@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:5173"
+              - "http://localhost:8087"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: auth-service
+          uri: http://${AUTH_SERVICE_HOST:localhost}:${AUTH_SERVICE_PORT:8087}
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: user-service
+          uri: http://${USER_SERVICE_HOST:localhost}:${USER_SERVICE_PORT:8082}
+          predicates:
+            - Path=/api/v1/users/**,/api/v1/businesses/**
+        - id: certificate-service
+          uri: http://${CERTIFICATE_SERVICE_HOST:localhost}:${CERTIFICATE_SERVICE_PORT:8083}
+          predicates:
+            - Path=/api/v1/certificates/**
+        - id: notification-service
+          uri: http://${NOTIFICATION_SERVICE_HOST:localhost}:${NOTIFICATION_SERVICE_PORT:8084}
+          predicates:
+            - Path=/api/v1/notifications/**
+        - id: file-service
+          uri: http://${FILE_SERVICE_HOST:localhost}:${FILE_SERVICE_PORT:8085}
+          predicates:
+            - Path=/api/v1/files/**
+        - id: payment-service
+          uri: http://${PAYMENT_SERVICE_HOST:localhost}:${PAYMENT_SERVICE_PORT:8086}
+          predicates:
+            - Path=/api/v1/print-orders/**,/webhooks/stripe
+
+server:
+  port: ${SERVER_PORT:8090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

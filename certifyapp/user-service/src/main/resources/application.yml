@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/certifyapp}
+    username: ${DATABASE_USERNAME:certifyapp}
+    password: ${DATABASE_PASSWORD:certifyapp}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

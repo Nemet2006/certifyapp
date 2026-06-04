@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: payment-service
+
+certifyapp:
+  stripe:
+    api-key: ${STRIPE_API_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+
+server:
+  port: 8086
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

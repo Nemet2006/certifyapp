@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: certifyapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: ${ECR_REGISTRY}/certifyapp/api-gateway:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AUTH_SERVICE_HOST
+              value: auth-service
+            - name: USER_SERVICE_HOST
+              value: user-service
+            - name: CERTIFICATE_SERVICE_HOST
+              value: certificate-service
+            - name: NOTIFICATION_SERVICE_HOST
+              value: notification-service
+            - name: FILE_SERVICE_HOST
+              value: file-service
+            - name: PAYMENT_SERVICE_HOST
+              value: payment-service
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: certifyapp
+spec:
+  type: LoadBalancer
+  selector:
+    app: api-gateway
+  ports:
+    - port: 80
+      targetPort: 8080

@@ -1,0 +1,14 @@
+# Build: docker build -f docker/Dockerfile.service --build-arg SERVICE_MODULE=user-service -t certifyapp/user-service .
+FROM maven:3.9-eclipse-temurin-21 AS builder
+ARG SERVICE_MODULE
+WORKDIR /build
+COPY certifyapp/ ./certifyapp/
+WORKDIR /build/certifyapp
+RUN chmod +x mvnw && ./mvnw -B -pl ${SERVICE_MODULE} -am package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+ARG SERVICE_MODULE
+WORKDIR /app
+COPY --from=builder /build/certifyapp/${SERVICE_MODULE}/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]

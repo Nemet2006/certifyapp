@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: certificate-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:certifyapp}
+    password: ${RABBITMQ_PASSWORD:certifyapp}
+
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

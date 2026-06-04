@@ -1,0 +1,175 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: certifyapp
+      POSTGRES_USER: certifyapp
+      POSTGRES_PASSWORD: certifyapp
+    ports:
+      # Host 5433 — avoids conflict when system PostgreSQL already uses 5432
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U certifyapp -d certifyapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      # Host 6380 — avoids conflict when system Redis already uses 6379
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: certifyapp
+      RABBITMQ_DEFAULT_PASS: certifyapp
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      SERVICES: s3
+      DEFAULT_REGION: eu-central-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/var/lib/localstack
+
+  user-service:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DATABASE_URL: jdbc:postgresql://postgres:5432/certifyapp
+      DATABASE_USERNAME: certifyapp
+      DATABASE_PASSWORD: certifyapp
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  auth-service:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8087"
+      JWT_SECRET: change-me-in-production-use-at-least-256-bits-long
+    ports:
+      - "8087:8087"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  certificate-service:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: certificate-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "8083:8083"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  notification-service:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "8084:8084"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  file-service:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: file-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      AWS_S3_BUCKET: certifyapp-dev
+    ports:
+      - "8085:8085"
+    depends_on:
+      - localstack
+
+  payment-service:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: payment-service
+    ports:
+      - "8086:8086"
+
+  api-gateway:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_MODULE: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - user-service
+      - certificate-service
+      - notification-service
+      - file-service
+      - payment-service
+
+  nginx:
+    profiles: ["nginx"]
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api-gateway
+
+volumes:
+  postgres_data:
+  localstack_data:

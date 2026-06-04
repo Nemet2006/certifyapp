@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: auth-service
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+# OAuth2 (Google/Apple): enable profile `oauth2` when credentials are set — see application-oauth2.yml
+
+certifyapp:
+  jwt:
+    issuer: ${JWT_ISSUER:certifyapp}
+    secret: ${JWT_SECRET:change-me-in-production-use-at-least-256-bits}
+    access-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:15}
+    refresh-ttl-days: ${JWT_REFRESH_TTL_DAYS:7}
+
+server:
+  port: ${SERVER_PORT:8087}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
