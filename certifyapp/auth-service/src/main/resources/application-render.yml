@@ -10,5 +10,7 @@ server:
   port: ${PORT:${SERVER_PORT:8087}}
 
 certifyapp:
+  user-service:
+    base-url: https://${USER_SERVICE_HOST:certifyapp-user.onrender.com}
   cors:
     allowed-origins: http://localhost:5173,https://nemet2006.github.io

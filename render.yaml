@@ -56,6 +56,11 @@ services:
         value: render
       - key: JWT_SECRET
         generateValue: true
+      - key: USER_SERVICE_HOST
+        fromService:
+          name: certifyapp-user
+          type: web
+          property: host
 
   - type: web
     name: certifyapp-gateway

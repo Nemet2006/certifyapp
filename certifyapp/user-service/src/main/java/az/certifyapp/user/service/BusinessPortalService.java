@@ -7,6 +7,7 @@ import az.certifyapp.common.exception.ResourceNotFoundException;
 import az.certifyapp.user.dto.*;
 import az.certifyapp.user.entity.*;
 import az.certifyapp.user.repository.*;
+import az.certifyapp.user.util.EmailNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +58,11 @@ public class BusinessPortalService {
 
     @Transactional
     public BusinessResponse ensureBusinessForUser(String email, String orgName) {
-        UserEntity user = userRepository.findByEmail(email)
+        String normalizedEmail = EmailNormalizer.normalize(email);
+        UserEntity user = userRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseGet(() -> {
                     UserEntity u = new UserEntity();
-                    u.setEmail(email);
+                    u.setEmail(normalizedEmail);
                     u.setRole(Role.BUSINESS);
                     return userRepository.save(u);
                 });

@@ -17,9 +17,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     ResponseEntity<ApiError> handleBusiness(BusinessException ex, HttpServletRequest request) {
-        HttpStatus status = ex.getErrorCode() == ErrorCode.RESOURCE_NOT_FOUND
-                ? HttpStatus.NOT_FOUND
-                : HttpStatus.BAD_REQUEST;
+        HttpStatus status = switch (ex.getErrorCode()) {
+            case RESOURCE_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
+            case CONFLICT -> HttpStatus.CONFLICT;
+            case FORBIDDEN -> HttpStatus.FORBIDDEN;
+            default -> HttpStatus.BAD_REQUEST;
+        };
         return ResponseEntity.status(status)
                 .body(ApiError.of(status.value(), ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
     }

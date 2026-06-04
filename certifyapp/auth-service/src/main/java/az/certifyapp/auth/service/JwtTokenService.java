@@ -37,7 +37,7 @@ public class JwtTokenService {
                 .compact();
     }
 
-    public String createRefreshToken(UUID userId) {
+    public String createRefreshToken(UUID userId, String email, Role role) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(properties.refreshTtlDays() * 24 * 3600);
         return Jwts.builder()
@@ -46,8 +46,29 @@ public class JwtTokenService {
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .claim("type", "refresh")
+                .claim(JwtClaimKeys.EMAIL, email)
+                .claim(JwtClaimKeys.ROLE, role.name())
                 .signWith(secretKey())
                 .compact();
+    }
+
+    public RefreshClaims parseRefreshClaims(String refreshToken) {
+        var claims = Jwts.parser()
+                .verifyWith(secretKey())
+                .build()
+                .parseSignedClaims(refreshToken)
+                .getPayload();
+        if (!"refresh".equals(claims.get("type"))) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+        UUID userId = UUID.fromString(claims.getSubject());
+        String email = claims.get(JwtClaimKeys.EMAIL, String.class);
+        String roleName = claims.get(JwtClaimKeys.ROLE, String.class);
+        Role role = roleName != null ? Role.valueOf(roleName) : Role.USER;
+        return new RefreshClaims(userId, email != null ? email : "user@certifyapp.local", role);
+    }
+
+    public record RefreshClaims(UUID userId, String email, Role role) {
     }
 
     private SecretKey secretKey() {

@@ -26,13 +26,10 @@ export const useBusinessStore = create<BusinessState>()(
             set({ business: data, loading: false });
             return data;
           } catch {
-            if (orgName) {
-              const { data } = await businessesApi.setup(email, orgName);
-              set({ business: data, loading: false });
-              return data;
-            }
-            set({ business: null, loading: false, error: 'Təşkilat tapılmadı' });
-            return null;
+            const name = orgName?.trim() || 'Təşkilatım';
+            const { data } = await businessesApi.setup(email, name);
+            set({ business: data, loading: false });
+            return data;
           }
         } catch {
           set({ loading: false, error: 'Backend əlçatan deyil' });

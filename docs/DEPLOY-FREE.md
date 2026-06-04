@@ -11,11 +11,15 @@ Render pulsuz planda **kart olmadan** adətən yalnız **2 web servis** saxlanı
 | **User / biznes API** | https://certifyapp-user.onrender.com |
 | ~~Gateway~~ | Lazım deyil (kart tələb edir) |
 
+## Köhnə biznes hesabı
+
+Əvvəlki deploy-da parol user DB-də saxlanmırdı. Yeni versiyadan sonra **web-də yenidən qeydiyyat** edin (eyni email ilə), sonra tədbir yarada bilərsiniz.
+
 ## Sizin addımlar (vacib)
 
 1. **GitHub**-da `main` yeniləndikdən sonra Render-da mövcud servisləri **yenidən deploy** edin (yeni servis yox):
-   - `certifyapp-auth` → **Manual Deploy** → Deploy latest commit
-   - `certifyapp-user` → eyni
+   - `certifyapp-user` → **Manual Deploy** (əvvəl)
+   - `certifyapp-auth` → **Manual Deploy** (auth user servisinə qoşulur)
 2. Web artıq gateway gözləmir; qeydiyyat `auth`, tədbirlər `user` ünvanına gedir.
 
 İlk sorğu 30–60 san gözlətmə normaldır (servis yuxarıdan oyanır).

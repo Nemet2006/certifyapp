@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { eventsApi, type EventResponse } from '../api/client';
@@ -43,8 +44,11 @@ export function EventsPage() {
       setEndDate('');
       setShowForm(false);
       await load();
-    } catch {
-      setError('Tədbir yaradılmadı');
+    } catch (err) {
+      const detail = axios.isAxiosError(err)
+        ? (err.response?.data as { message?: string })?.message
+        : null;
+      setError(detail ?? 'Tədbir yaradılmadı. Tarix seçildi? Render-da user servisi deploy olunub?');
     }
   };
 
