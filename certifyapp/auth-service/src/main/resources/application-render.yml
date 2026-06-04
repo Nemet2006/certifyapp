@@ -8,3 +8,7 @@ spring:
 
 server:
   port: ${PORT:${SERVER_PORT:8087}}
+
+certifyapp:
+  cors:
+    allowed-origins: http://localhost:5173,https://nemet2006.github.io

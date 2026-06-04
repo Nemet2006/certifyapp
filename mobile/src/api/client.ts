@@ -1,14 +1,29 @@
-import axios from 'axios';
-import { getApiUrl } from '../config/api';
+import axios, { type InternalAxiosRequestConfig } from 'axios';
+import { getApiUrl, getAuthUrl } from '../config/api';
 import { getAccessToken } from '../auth/tokenStorage';
 
-export const api = axios.create({
+const authHttp = axios.create({
   headers: { 'Content-Type': 'application/json' },
   timeout: 15_000,
 });
 
-api.interceptors.request.use(async (config) => {
-  config.baseURL = getApiUrl();
+const api = axios.create({
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 15_000,
+});
+
+const attachBaseAndToken = async (config: Parameters<Parameters<typeof api.interceptors.request.use>[0]>[0]) => {
+  const isAuth = config.url?.startsWith('/api/v1/auth');
+  config.baseURL = isAuth ? getAuthUrl() : getApiUrl();
+  const token = await getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+authHttp.interceptors.request.use(async (config) => {
+  config.baseURL = getAuthUrl();
   const token = await getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -39,9 +54,9 @@ export interface BusinessResponse {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<TokenResponse>('/api/v1/auth/login', { email, password }),
+    authHttp.post<TokenResponse>('/api/v1/auth/login', { email, password }),
   register: (email: string, password: string, fullName?: string) =>
-    api.post<TokenResponse>('/api/v1/auth/register', {
+    authHttp.post<TokenResponse>('/api/v1/auth/register', {
       email,
       password,
       fullName,
@@ -83,7 +98,7 @@ export function getApiErrorMessage(err: unknown): string {
   const base = getApiUrl();
   if (axios.isAxiosError(err)) {
     if (!err.response && (err.code === 'ECONNABORTED' || err.message === 'Network Error')) {
-      return `Serverə qoşula bilmədi (${base}).\n\n• Backend işləyir? (run-backend.sh)\n• Fiziki telefondasınızsa Profil və ya .env-də IP:8090 yazın\n• Eyni WiFi şəbəkəsində olun`;
+      return `Serverə qoşula bilmədi (${base}).\n\n• Backend işləyir? (run-backend.sh)\n• Fiziki telefondasınızsa Profil və ya .env-də IP yazın\n• Eyni WiFi şəbəkəsində olun`;
     }
     const msg = err.response?.data?.message;
     if (typeof msg === 'string') return msg;

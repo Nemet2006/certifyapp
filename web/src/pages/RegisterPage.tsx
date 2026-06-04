@@ -27,7 +27,7 @@ export function RegisterPage() {
       await loadBusiness(email, orgName);
       navigate('/dashboard');
     } catch {
-      setError('Qeydiyyat tamamlanmadı. Backend (api-gateway + auth-service) işə salınıb?');
+      setError('Qeydiyyat tamamlanmadı. Auth və user servisləri Render-da deploy olunub? (Manual Deploy)');
     } finally {
       setLoading(false);
     }

@@ -1,17 +1,37 @@
-import axios from 'axios';
+import axios, { type InternalAxiosRequestConfig } from 'axios';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '',
-  headers: { 'Content-Type': 'application/json' },
-});
+/** Auth (login/register) — gateway olmadan birbaşa auth-service */
+const authBase =
+  import.meta.env.VITE_AUTH_URL ??
+  import.meta.env.VITE_API_URL ??
+  'https://certifyapp-auth.onrender.com';
 
-api.interceptors.request.use((config) => {
+/** Biznes API (events, certificates) — user-service */
+const userBase =
+  import.meta.env.VITE_USER_URL ??
+  import.meta.env.VITE_API_URL ??
+  'https://certifyapp-user.onrender.com';
+
+const attachAuth = (config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('accessToken');
-  if (token) {
+  if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+};
+
+const authHttp = axios.create({
+  baseURL: authBase.replace(/\/$/, ''),
+  headers: { 'Content-Type': 'application/json' },
 });
+
+const api = axios.create({
+  baseURL: userBase.replace(/\/$/, ''),
+  headers: { 'Content-Type': 'application/json' },
+});
+
+authHttp.interceptors.request.use(attachAuth);
+api.interceptors.request.use(attachAuth);
 
 export interface TokenResponse {
   accessToken: string;
@@ -85,9 +105,9 @@ export interface CertificateVerifyResponse {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<TokenResponse>('/api/v1/auth/login', { email, password }),
+    authHttp.post<TokenResponse>('/api/v1/auth/login', { email, password }),
   register: (email: string, password: string, fullName?: string, role: 'USER' | 'BUSINESS' = 'BUSINESS') =>
-    api.post<TokenResponse>('/api/v1/auth/register', {
+    authHttp.post<TokenResponse>('/api/v1/auth/register', {
       email,
       password,
       fullName,
@@ -147,7 +167,8 @@ export const issuedCertificatesApi = {
 };
 
 export const healthApi = {
-  gateway: () => api.get('/actuator/health'),
+  auth: () => authHttp.get('/actuator/health'),
+  user: () => api.get('/actuator/health'),
 };
 
 export default api;

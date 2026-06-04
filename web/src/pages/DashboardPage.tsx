@@ -11,7 +11,9 @@ export function DashboardPage() {
   const [businessCount, setBusinessCount] = useState<number | null>(null);
 
   useEffect(() => {
-    healthApi.gateway().then(() => setHealth('up')).catch(() => setHealth('down'));
+    Promise.all([healthApi.auth(), healthApi.user()])
+      .then(() => setHealth('up'))
+      .catch(() => setHealth('down'));
     usersApi.list().then((r) => setUserCount(r.data.length)).catch(() => setUserCount(null));
     businessesApi.list().then((r) => setBusinessCount(r.data.length)).catch(() => setBusinessCount(null));
   }, []);

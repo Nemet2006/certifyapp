@@ -1,39 +1,51 @@
-# Pulsuz deploy (müvəqqəti)
+# Pulsuz deploy (gateway olmadan)
+
+Render pulsuz planda **kart olmadan** adətən yalnız **2 web servis** saxlanır. Ona görə **api-gateway** yaratmaq üçün kart tələb olunur. Həll: frontend birbaşa **auth** və **user** servislərinə qoşulur.
 
 ## Canlı ünvanlar
 
-| Komponent | URL | Platform |
-|-----------|-----|----------|
-| **Web (biznes)** | https://nemet2006.github.io/certifyapp/ | GitHub Pages (pulsuz) |
-| **API** | https://certifyapp-gateway.onrender.com | Render (pulsuz) |
+| Komponent | URL |
+|-----------|-----|
+| **Web (biznes)** | https://nemet2006.github.io/certifyapp/ |
+| **Auth API** | https://certifyapp-auth.onrender.com |
+| **User / biznes API** | https://certifyapp-user.onrender.com |
+| ~~Gateway~~ | Lazım deyil (kart tələb edir) |
 
-Mobil `.env`:
+## Sizin addımlar (vacib)
+
+1. **GitHub**-da `main` yeniləndikdən sonra Render-da mövcud servisləri **yenidən deploy** edin (yeni servis yox):
+   - `certifyapp-auth` → **Manual Deploy** → Deploy latest commit
+   - `certifyapp-user` → eyni
+2. Web artıq gateway gözləmir; qeydiyyat `auth`, tədbirlər `user` ünvanına gedir.
+
+İlk sorğu 30–60 san gözlətmə normaldır (servis yuxarıdan oyanır).
+
+## Web build (GitHub Pages)
+
+```bash
+cd web
+npm ci
+VITE_BASE_PATH=/certifyapp/ \
+VITE_AUTH_URL=https://certifyapp-auth.onrender.com \
+VITE_USER_URL=https://certifyapp-user.onrender.com \
+npm run build
 ```
-EXPO_PUBLIC_API_URL=https://certifyapp-gateway.onrender.com
+
+`dist/` məzmununu `gh-pages` branch-ə push edin (və ya Actions workflow).
+
+## Mobil `.env`
+
+```env
+EXPO_PUBLIC_AUTH_URL=https://certifyapp-auth.onrender.com
+EXPO_PUBLIC_USER_URL=https://certifyapp-user.onrender.com
 ```
 
-## 1. Backend — Render (bir dəfə)
+## Lokal
 
-1. [Render Dashboard](https://dashboard.render.com/) → **Sign up** (GitHub ilə)
-2. **New** → **Blueprint** → repo: `Nemet2006/certifyapp`
-3. `render.yaml` avtomatik oxunur → **Apply**
-4. 3 web servis + Postgres yaradılır (~10–15 dəq build)
-5. Gateway URL: `https://certifyapp-gateway.onrender.com/actuator/health` → `{"status":"UP"}`
+- Auth: `http://localhost:8087`
+- User: `http://localhost:8082`
+- Gateway (opsional): `http://localhost:8090`
 
-**Pulsuz plan:** 15 dəqiqə aktivlik yoxdursa servis yatır; ilk sorğu 30–60 san gözlətmə normaldır.
+## Gateway (gələcək)
 
-## 2. Web — GitHub Pages (avtomatik)
-
-`main` branch-ə push olanda `.github/workflows/deploy-pages.yml` işləyir.
-
-İlk dəfə GitHub-da:
-**Settings → Pages → Build: GitHub Actions**
-
-## 3. API URL dəyişməsi
-
-Render-də gateway adı fərqlidirsə, GitHub **Settings → Secrets and variables → Actions → Variables**:
-- `VITE_API_URL` = `https://SIZIN-GATEWAY.onrender.com`
-
-## Deploy düyməsi
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Nemet2006/certifyapp)
+Kart əlavə edib 3-cü web servis yaratsanız, `VITE_API_URL` / `EXPO_PUBLIC_API_URL` ilə tək gateway URL istifadə edə bilərsiniz.

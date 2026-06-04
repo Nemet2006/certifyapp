@@ -11,6 +11,8 @@ spring:
 # OAuth2 (Google/Apple): enable profile `oauth2` when credentials are set — see application-oauth2.yml
 
 certifyapp:
+  cors:
+    allowed-origins: http://localhost:5173,https://nemet2006.github.io
   jwt:
     issuer: ${JWT_ISSUER:certifyapp}
     secret: ${JWT_SECRET:change-me-in-production-use-at-least-256-bits}
