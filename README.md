@@ -114,6 +114,15 @@ cd certifyapp && ./mvnw verify
 
 Detallı mobil: [`mobile/README.md`](mobile/README.md)
 
+## Pulsuz deploy (canlı demo)
+
+| | URL |
+|--|-----|
+| Web panel | https://nemet2006.github.io/certifyapp/ |
+| API | https://certifyapp-gateway.onrender.com |
+
+Addım-addım: [`docs/DEPLOY-FREE.md`](docs/DEPLOY-FREE.md) · Render: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Nemet2006/certifyapp)
+
 ## Lisenziya
 
 MIT (dəyişdirin)

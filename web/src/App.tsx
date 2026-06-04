@@ -9,6 +9,9 @@ import { BusinessesPage } from './pages/BusinessesPage';
 import { EventsPage } from './pages/EventsPage';
 import { CertificatesPage } from './pages/CertificatesPage';
 import { PrintOrdersPage } from './pages/PrintOrdersPage';
+import { EventDetailPage } from './pages/EventDetailPage';
+import { VerifyCertificatePage } from './pages/VerifyCertificatePage';
+import { BusinessBootstrap } from './components/BusinessBootstrap';
 import { useAuthStore } from './store/authStore';
 
 function ProtectedRoute() {
@@ -39,10 +42,18 @@ export default function App() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<Layout />}>
+        <Route
+          element={
+            <BusinessBootstrap>
+              <Layout />
+            </BusinessBootstrap>
+          }
+        >
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/dashboard/events" element={<EventsPage />} />
+          <Route path="/dashboard/events/:eventId" element={<EventDetailPage />} />
           <Route path="/dashboard/certificates" element={<CertificatesPage />} />
+          <Route path="/dashboard/verify" element={<VerifyCertificatePage />} />
           <Route path="/dashboard/print-orders" element={<PrintOrdersPage />} />
           <Route path="/dashboard/users" element={<UsersPage />} />
           <Route path="/dashboard/businesses" element={<BusinessesPage />} />

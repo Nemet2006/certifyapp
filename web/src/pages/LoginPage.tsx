@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/client';
 import { Alert } from '../components/Alert';
 import { useAuthStore } from '../store/authStore';
+import { useBusinessStore } from '../store/businessStore';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const setTokens = useAuthStore((s) => s.setTokens);
+  const loadBusiness = useBusinessStore((s) => s.loadForEmail);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +21,7 @@ export function LoginPage() {
     try {
       const { data } = await authApi.login(email, password);
       setTokens(data.accessToken, data.refreshToken, email);
+      await loadBusiness(email);
       navigate('/dashboard');
     } catch {
       setError('Giriş uğursuz oldu. API işləyir? Email və şifrəni yoxlayın.');

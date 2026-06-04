@@ -61,6 +61,24 @@ export const healthApi = {
   check: () => api.get('/actuator/health'),
 };
 
+export interface CertificateVerifyResponse {
+  verificationCode: string;
+  authStatus: 'ISSUED' | 'AUTHENTIC' | 'REVOKED' | null;
+  found: boolean;
+  title: string | null;
+  holderName: string | null;
+  businessName: string | null;
+  eventTitle: string | null;
+  message: string;
+}
+
+export const verifyApi = {
+  byCode: (code: string) =>
+    api.get<CertificateVerifyResponse>(
+      `/api/v1/issued-certificates/verify/${encodeURIComponent(code.trim().toUpperCase())}`
+    ),
+};
+
 export function getApiErrorMessage(err: unknown): string {
   const base = getApiUrl();
   if (axios.isAxiosError(err)) {

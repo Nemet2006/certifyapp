@@ -1,12 +1,15 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../api/client';
+import { authApi, businessesApi } from '../api/client';
 import { Alert } from '../components/Alert';
 import { useAuthStore } from '../store/authStore';
+import { useBusinessStore } from '../store/businessStore';
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const setTokens = useAuthStore((s) => s.setTokens);
+  const loadBusiness = useBusinessStore((s) => s.loadForEmail);
+  const [orgName, setOrgName] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +23,8 @@ export function RegisterPage() {
     try {
       const { data } = await authApi.register(email, password, fullName || undefined, 'BUSINESS');
       setTokens(data.accessToken, data.refreshToken, email);
+      await businessesApi.setup(email, orgName);
+      await loadBusiness(email, orgName);
       navigate('/dashboard');
     } catch {
       setError('Qeydiyyat tamamlanmadı. Backend (api-gateway + auth-service) işə salınıb?');
@@ -41,8 +46,22 @@ export function RegisterPage() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
+          <label htmlFor="orgName" className="label-text">
+            Təşkilat adı
+          </label>
+          <input
+            id="orgName"
+            type="text"
+            required
+            className="input-field"
+            value={orgName}
+            onChange={(e) => setOrgName(e.target.value)}
+            placeholder="məs: BSU Tələbə Konseyi"
+          />
+        </div>
+        <div>
           <label htmlFor="fullName" className="label-text">
-            Ad, soyad
+            Əlaqə şəxsi (ad)
           </label>
           <input
             id="fullName"

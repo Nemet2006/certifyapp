@@ -1,0 +1,93 @@
+# Render Blueprint — pulsuz plan (müvəqqəti demo)
+# https://dashboard.render.com/select-repo?type=blueprint
+# Qeyd: Pulsuz web servislər ~15 dəq boş qaldıqda "yuxuya" gedir; ilk sorğu 30–60 san gözlətmə ola bilər.
+
+databases:
+  - name: certifyapp-db
+    databaseName: certifyapp
+    user: certifyapp
+    plan: free
+
+services:
+  - type: web
+    name: certifyapp-user
+    runtime: docker
+    plan: free
+    dockerfilePath: docker/Dockerfile.service
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SERVICE_MODULE
+        value: user-service
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: DB_HOST
+        fromDatabase:
+          name: certifyapp-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: certifyapp-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: certifyapp-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: certifyapp-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: certifyapp-db
+          property: password
+
+  - type: web
+    name: certifyapp-auth
+    runtime: docker
+    plan: free
+    dockerfilePath: docker/Dockerfile.service
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SERVICE_MODULE
+        value: auth-service
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: JWT_SECRET
+        generateValue: true
+
+  - type: web
+    name: certifyapp-gateway
+    runtime: docker
+    plan: free
+    dockerfilePath: docker/Dockerfile.service
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SERVICE_MODULE
+        value: api-gateway
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: AUTH_SERVICE_HOST
+        fromService:
+          name: certifyapp-auth
+          type: web
+          property: host
+      - key: AUTH_SERVICE_PORT
+        fromService:
+          name: certifyapp-auth
+          type: web
+          property: port
+      - key: USER_SERVICE_HOST
+        fromService:
+          name: certifyapp-user
+          type: web
+          property: host
+      - key: USER_SERVICE_PORT
+        fromService:
+          name: certifyapp-user
+          type: web
+          property: port
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://nemet2006.github.io,https://certifyapp-gateway.onrender.com

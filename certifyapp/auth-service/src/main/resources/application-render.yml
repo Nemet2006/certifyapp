@@ -1,0 +1,10 @@
+# Render pulsuz planda Redis yoxdur — JWT stub Redis olmadan işləyir
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+server:
+  port: ${PORT:${SERVER_PORT:8087}}

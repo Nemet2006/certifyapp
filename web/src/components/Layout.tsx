@@ -1,20 +1,22 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { useAuthStore } from '../store/authStore';
+import { useBusinessStore } from '../store/businessStore';
 
 const nav = [
   { to: '/dashboard', label: 'İdarə paneli', icon: '◆' },
-  { to: '/dashboard/events', label: 'Tədbirlər', icon: '◇' },
-  { to: '/dashboard/certificates', label: 'Sertifikatlar', icon: '◇' },
+  { to: '/dashboard/events', label: 'Tədbirlər & konullular', icon: '◇' },
+  { to: '/dashboard/certificates', label: 'Verilmiş sertifikatlar', icon: '◇' },
+  { to: '/dashboard/verify', label: 'Doğrulama (saxta?)', icon: '◇' },
   { to: '/dashboard/print-orders', label: 'Çap', icon: '◇' },
   { to: '/dashboard/users', label: 'İstifadəçilər', icon: '◇' },
-  { to: '/dashboard/businesses', label: 'Bizneslər', icon: '◇' },
 ];
 
 export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { email, logout } = useAuthStore();
+  const business = useBusinessStore((s) => s.business);
 
   const handleLogout = () => {
     logout();
@@ -52,8 +54,9 @@ export function Layout() {
           })}
         </nav>
         <div className="p-4 m-4 rounded-xl bg-white/5 border border-white/8">
-          <p className="text-[10px] uppercase tracking-wider text-parchment-200/40">Hesab</p>
-          <p className="text-sm truncate mt-1 text-parchment-100">{email ?? '—'}</p>
+          <p className="text-[10px] uppercase tracking-wider text-parchment-200/40">Təşkilat</p>
+          <p className="text-sm truncate mt-1 text-parchment-100 font-medium">{business?.name ?? '—'}</p>
+          <p className="text-xs text-parchment-200/40 truncate mt-0.5">{email ?? '—'}</p>
           <button
             type="button"
             onClick={handleLogout}
