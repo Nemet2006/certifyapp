@@ -1,6 +1,35 @@
 # CertifyApp
 
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18%20%2F%20RN-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+
 Sertifikat platforması — **istifadəçilər** mobil tətbiqdən skan edir, arxivləyir və çap edir; **bizneslər** web portalından tədbir və buraxılışları idarə edir.
+
+## Languages & tech stack
+
+GitHub bu repoda əsasən aşağıdakı dilləri göstərəcək (mənbə koduna görə):
+
+| Dil / format | Harada | Nə üçün |
+|--------------|--------|---------|
+| **Java** | `certifyapp/` | Spring Boot 3.3 mikroservislər (Java **21**) |
+| **TypeScript** | `mobile/`, `web/` | React Native (Expo 54) + Vite React biznes paneli |
+| **TSX** | `mobile/src/`, `web/src/` | UI komponentləri və səhifələr |
+| **SQL** | `certifyapp/user-service/.../db/migration/` | Flyway migrasiyalar (PostgreSQL) |
+| **YAML** | `*.yml`, `docker-compose.yml`, `k8s/` | Spring konfiqurasiya, Docker, Kubernetes |
+| **Shell** | `scripts/*.sh`, `certifyapp/mvnw` | Backend/mobil işə salma skriptləri |
+| **CSS** | `web/src/index.css` | Tailwind CSS 3.4 |
+| **HTML** | `web/index.html`, `notification-service/.../templates/` | Web giriş, email şablonu |
+| **JavaScript** | `babel.config.js`, `vite.config.ts` konfiqləri | Build alətləri (əsas məntiq TypeScript-də) |
+| **XML** | `pom.xml` | Maven multi-modul layihə |
+| **Properties** | `application*.properties` | Spring profillər |
+| **Dockerfile** | `docker/Dockerfile.service` | Konteyner image build |
+
+**Əsas runtime:** Node.js (Expo / Vite), JVM 21 (backend), PostgreSQL 16, Redis, RabbitMQ.
+
+**GitHub Languages təxmini paylanma:** Java (backend) ~45–55% · TypeScript/TSX (mobil + web) ~40–50% · SQL, YAML, Shell və digər konfiq ~5–10%.
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────────┐
@@ -55,7 +84,7 @@ npm run start:phone    # Expo Go SDK 54, QR skan
 
 **Mobil funksiyalar:** CamScanner tipli skan, qalereya, arxiv, PDF çap (`expo-print`), QR doğrulama, profil.
 
-**Web funksiyalar:** İdarə paneli, tədbirlər (mock UI), verilmiş sertifikatlar, çap sifarişləri, istifadəçi/biznes API.
+**Web funksiyalar:** Tədbir, konullu əlavə, sertifikat göndərmə, doğrulama (təsdiq/saxta), çap sifarişləri, istifadəçi/biznes API.
 
 ## Dizayn (Stitch tipli)
 
