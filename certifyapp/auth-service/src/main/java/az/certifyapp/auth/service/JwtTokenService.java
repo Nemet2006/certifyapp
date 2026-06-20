@@ -74,9 +74,11 @@ public class JwtTokenService {
     private SecretKey secretKey() {
         byte[] keyBytes = properties.secret().getBytes(StandardCharsets.UTF_8);
         if (keyBytes.length < 32) {
-            byte[] padded = new byte[32];
-            System.arraycopy(keyBytes, 0, padded, 0, Math.min(keyBytes.length, 32));
-            return Keys.hmacShaKeyFor(padded);
+            throw new IllegalArgumentException(
+                "JWT secret must be at least 32 bytes (256 bits) after UTF-8 encoding. " +
+                "Current length: " + keyBytes.length + ". " +
+                "Provide a strong, random secret via the JWT_SECRET environment variable."
+            );
         }
         return Keys.hmacShaKeyFor(keyBytes);
     }

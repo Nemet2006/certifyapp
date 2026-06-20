@@ -12,8 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -34,8 +32,7 @@ public class ParticipationEntity {
     private UserEntity user;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(nullable = false, columnDefinition = "participation_status")
+    @Column(nullable = false, length = 25)
     private ParticipationStatus status;
 
     @Column(name = "created_at", nullable = false)

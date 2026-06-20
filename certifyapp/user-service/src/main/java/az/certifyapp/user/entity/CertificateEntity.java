@@ -12,8 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -54,8 +52,7 @@ public class CertificateEntity {
     private String holderEmail;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "auth_status", nullable = false, columnDefinition = "certificate_auth_status")
+    @Column(name = "auth_status", nullable = false, length = 25)
     private CertificateAuthStatus authStatus;
 
     @Column(name = "pdf_url")

@@ -15,16 +15,16 @@ import { BusinessBootstrap } from './components/BusinessBootstrap';
 import { useAuthStore } from './store/authStore';
 
 function ProtectedRoute() {
-  const checkAuth = useAuthStore((s) => s.isAuthenticated);
-  if (!checkAuth()) {
+  const isAuth = useAuthStore((s) => !!s.accessToken);
+  if (!isAuth) {
     return <Navigate to="/login" replace />;
   }
   return <Outlet />;
 }
 
 function PublicOnly() {
-  const checkAuth = useAuthStore((s) => s.isAuthenticated);
-  if (checkAuth()) {
+  const isAuth = useAuthStore((s) => !!s.accessToken);
+  if (isAuth) {
     return <Navigate to="/dashboard" replace />;
   }
   return <Outlet />;

@@ -1,16 +1,21 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
 
+function getBaseUrl(envName: string): string {
+  const val = import.meta.env[envName];
+  if (typeof val === 'string' && val.trim().length > 0) {
+    return val.trim();
+  }
+  throw new Error(
+    `Missing required environment variable: ${envName}. ` +
+    `Set it in a .env file or via your build pipeline (e.g. VITE_AUTH_URL, VITE_USER_URL).`
+  );
+}
+
 /** Auth (login/register) — gateway olmadan birbaşa auth-service */
-const authBase =
-  import.meta.env.VITE_AUTH_URL ??
-  import.meta.env.VITE_API_URL ??
-  'https://certifyapp-auth.onrender.com';
+const authBase = getBaseUrl('VITE_AUTH_URL');
 
 /** Biznes API (events, certificates) — user-service */
-const userBase =
-  import.meta.env.VITE_USER_URL ??
-  import.meta.env.VITE_API_URL ??
-  'https://certifyapp-user.onrender.com';
+const userBase = getBaseUrl('VITE_USER_URL');
 
 const attachAuth = (config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('accessToken');

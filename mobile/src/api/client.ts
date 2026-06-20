@@ -12,20 +12,23 @@ const api = axios.create({
   timeout: 15_000,
 });
 
-const attachBaseAndToken = async (config: Parameters<Parameters<typeof api.interceptors.request.use>[0]>[0]) => {
+const attachBaseAndToken = async (config: InternalAxiosRequestConfig) => {
   const isAuth = config.url?.startsWith('/api/v1/auth');
   config.baseURL = isAuth ? getAuthUrl() : getApiUrl();
-  const token = await getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (!isAuth) {
+    const token = await getAccessToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
-});
+};
 
+api.interceptors.request.use(attachBaseAndToken);
 authHttp.interceptors.request.use(async (config) => {
   config.baseURL = getAuthUrl();
   const token = await getAccessToken();
-  if (token) {
+  if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

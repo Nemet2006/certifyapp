@@ -17,6 +17,9 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+jwt:
+  secret: ${JWT_SECRET:change-me-in-production-use-at-least-256-bits-long}
+
 certifyapp:
   cors:
     allowed-origins: http://localhost:5173,https://nemet2006.github.io
